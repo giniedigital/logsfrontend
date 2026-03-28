@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Changelog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#07080c;
+  --surface:#0d0e14;
+  --surface2:#12131a;
+  --surface3:#181920;
+  --border:rgba(255,255,255,.06);
+  --border2:rgba(255,255,255,.1);
+  --border3:rgba(255,255,255,.16);
+  --text:#ecedf2;
+  --text2:#7e8292;
+  --text3:#3e404e;
+  --accent:#c8f050;
+  --accent-dim:#a8d038;
+  --accent-glow:rgba(200,240,80,.12);
+  --red:#e8505f;--blue:#5090e8;--amber:#e8a830;
+  --purple:#8b6de0;--teal:#36b896;
+  --grid-line:rgba(255,255,255,.033);
+  --grid-line2:rgba(255,255,255,.02);
+  --tag-bg:rgba(255,255,255,.04);
+  --tag-border:rgba(255,255,255,.08);
+  --code-bg:#0a0b10;
+  --display:'Sora',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  --body:'Sora',sans-serif;
+  --shadow:0 0 0 1px rgba(255,255,255,.04),0 12px 48px rgba(0,0,0,.6);
+}
+
+[data-theme="light"]{
+  --bg:#f6f6f8;
+  --surface:#ffffff;
+  --surface2:#f0f0f4;
+  --surface3:#e8e8ee;
+  --border:rgba(0,0,0,.06);
+  --border2:rgba(0,0,0,.1);
+  --border3:rgba(0,0,0,.16);
+  --text:#111218;
+  --text2:#585c6e;
+  --text3:#a0a4b4;
+  --accent-glow:rgba(140,200,0,.08);
+  --grid-line:rgba(0,0,0,.04);
+  --grid-line2:rgba(0,0,0,.025);
+  --tag-bg:rgba(0,0,0,.04);
+  --tag-border:rgba(0,0,0,.09);
+  --code-bg:#f0f0f6;
+  --shadow:0 0 0 1px rgba(0,0,0,.05),0 12px 40px rgba(0,0,0,.07);
+}
+
+html{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--body);
+  font-size:15px;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+  transition:background .3s,color .3s;
+}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border3);border-radius:4px}
+
+/* ── RETRO GRID ── */
+.retro-grid{
+  position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+}
+.retro-grid::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(var(--grid-line) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
+  background-size:44px 44px;
+  mask-image:linear-gradient(to bottom,black 0%,transparent 50%);
+}
+.retro-grid-floor{
+  position:fixed;bottom:0;left:0;right:0;
+  height:52vh;pointer-events:none;z-index:0;overflow:hidden;
+}
+.retro-grid-floor::after{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(var(--grid-line2) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid-line2) 1px,transparent 1px);
+  background-size:56px 56px;
+  transform:perspective(480px) rotateX(58deg);
+  transform-origin:bottom center;
+  mask-image:linear-gradient(to top,rgba(0,0,0,.8) 0%,transparent 65%);
+}
+.header-bloom{
+  position:fixed;top:-80px;left:50%;transform:translateX(-50%);
+  width:700px;height:360px;
+  background:radial-gradient(ellipse at 50% 20%,rgba(200,240,80,.055) 0%,transparent 65%);
+  pointer-events:none;z-index:0;
+}
+
+/* ── PAGE ── */
+.page{
+  position:relative;z-index:1;
+  max-width:700px;margin:0 auto;
+  padding:0 28px 140px;
+}
+
+/* ── HEADER ── */
+header{
+  padding:72px 0 56px;text-align:center;
+  animation:fadeUp .6s cubic-bezier(.16,1,.3,1) both;
+}
+.header-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:10.5px;font-weight:500;
+  color:var(--text3);letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:22px;padding:5px 14px;
+  border:1px solid var(--border2);border-radius:999px;
+  background:var(--surface);
+}
+.badge-pulse{
+  width:6px;height:6px;border-radius:50%;background:var(--accent);
+  animation:ring 2.4s ease-in-out infinite;
+}
+@keyframes ring{
+  0%{box-shadow:0 0 0 0 rgba(200,240,80,.6)}
+  60%{box-shadow:0 0 0 7px rgba(200,240,80,0)}
+  100%{box-shadow:0 0 0 0 rgba(200,240,80,0)}
+}
+h1{
+  font-family:var(--display);font-weight:600;
+  font-size:clamp(2.2rem,5.5vw,3.2rem);
+  letter-spacing:-.04em;line-height:1.08;
+  color:var(--text);margin-bottom:16px;
+}
+.header-sub{
+  font-size:14px;color:var(--text2);font-weight:300;
+  max-width:380px;margin:0 auto 32px;line-height:1.7;
+}
+.header-actions{display:flex;align-items:center;justify-content:center;gap:8px}
+.pill-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:8px 18px;border-radius:999px;
+  font-size:12px;font-family:var(--mono);font-weight:500;
+  background:var(--surface);border:1px solid var(--border2);
+  color:var(--text2);cursor:pointer;transition:all .2s;letter-spacing:.3px;
+}
+.pill-btn:hover{background:var(--surface2);color:var(--text);border-color:var(--border3)}
+.pill-btn svg{width:13px;height:13px;flex-shrink:0}
+
+/* ── CONNECT CARD ── */
+.connect-card{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:16px;padding:36px;max-width:460px;margin:0 auto;
+  animation:fadeUp .5s cubic-bezier(.16,1,.3,1) both;box-shadow:var(--shadow);
+}
+.connect-card h3{
+  font-family:var(--display);font-weight:600;
+  font-size:1.15rem;letter-spacing:-.03em;margin-bottom:8px;
+}
+.connect-card p{font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.65;font-weight:300}
+.cfg-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.cfg-group label{font-size:10.5px;font-family:var(--mono);color:var(--text3);text-transform:uppercase;letter-spacing:1px}
+.cfg-input{
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:8px;padding:10px 14px;
+  font-size:12.5px;font-family:var(--mono);color:var(--text);
+  width:100%;outline:none;transition:border-color .15s;
+}
+.cfg-input:focus{border-color:rgba(200,240,80,.45);background:var(--surface3)}
+.cfg-input::placeholder{color:var(--text3)}
+.connect-btn{
+  background:var(--accent);color:#080b0e;border:none;
+  border-radius:8px;padding:11px 20px;
+  font-size:13px;font-weight:600;font-family:var(--body);
+  cursor:pointer;transition:all .15s;width:100%;margin-top:6px;
+}
+.connect-btn:hover{background:var(--accent-dim);transform:translateY(-1px)}
+.cfg-error{font-size:12px;color:var(--red);margin-top:10px;display:none;font-family:var(--mono)}
+.cfg-error.show{display:block}
+.cfg-reset{
+  background:none;border:none;font-size:11px;font-family:var(--mono);
+  color:var(--text3);cursor:pointer;text-decoration:underline;
+  padding:10px 0;display:block;letter-spacing:.3px;
+}
+
+/* ── SKELETONS ── */
+.skeleton-entry{
+  padding:44px 0 44px 40px;border-bottom:1px solid var(--border);
+  animation:shimmer 1.8s ease-in-out infinite;
+}
+.skel{height:9px;background:var(--surface2);border-radius:5px;margin-bottom:12px}
+.skel-xs{width:10%}.skel-sm{width:18%}.skel-med{width:42%}.skel-lg{width:70%}.skel-xl{width:88%}
+@keyframes shimmer{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* ── STATE BOXES ── */
+.state-box{text-align:center;padding:90px 20px;color:var(--text3);animation:fadeUp .4s ease both}
+.state-box svg{width:32px;height:32px;margin:0 auto 16px;opacity:.25;display:block}
+.state-box p{font-size:13px;font-family:var(--mono);letter-spacing:.3px;margin-bottom:18px}
+
+/* ── TIMELINE ── */
+.timeline{position:relative;padding-top:4px}
+.timeline::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:1px;
+  background:linear-gradient(to bottom,transparent 0%,var(--border) 8%,var(--border) 92%,transparent 100%);
+}
+
+/* ── ENTRY ── */
+.entry{
+  position:relative;padding:0 0 68px 48px;
+  animation:fadeUp .55s cubic-bezier(.16,1,.3,1) both;
+}
+.entry:nth-child(1){animation-delay:.04s}
+.entry:nth-child(2){animation-delay:.1s}
+.entry:nth-child(3){animation-delay:.16s}
+.entry:nth-child(4){animation-delay:.22s}
+.entry:nth-child(5){animation-delay:.28s}
+.entry:nth-child(6){animation-delay:.34s}
+.entry::before{
+  content:'';position:absolute;left:-5px;top:8px;
+  width:11px;height:11px;border-radius:50%;
+  background:var(--surface);border:1.5px solid var(--border3);
+  transition:border-color .2s,background .2s,box-shadow .2s;
+}
+.entry:hover::before{
+  border-color:var(--accent);background:var(--accent-glow);
+  box-shadow:0 0 0 4px rgba(200,240,80,.06);
+}
+
+.entry-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.entry-date{font-size:12px;font-family:var(--mono);color:var(--text3);letter-spacing:.4px}
+.entry-version{
+  font-family:var(--mono);font-size:10.5px;font-weight:500;
+  background:var(--surface2);border:1px solid var(--border2);
+  color:var(--text2);padding:3px 10px;border-radius:5px;letter-spacing:.5px;
+}
+.entry-status-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--teal);
+  box-shadow:0 0 6px var(--teal);margin-left:2px;
+}
+
+.entry-title{
+  font-family:var(--display);font-weight:600;
+  font-size:clamp(1.2rem,2.8vw,1.6rem);
+  letter-spacing:-.03em;line-height:1.2;
+  color:var(--text);margin-bottom:14px;
+}
+
+.entry-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px}
+.tag{
+  font-size:10px;font-family:var(--mono);font-weight:500;
+  padding:3px 10px;border-radius:5px;letter-spacing:.5px;
+  background:var(--tag-bg);border:1px solid var(--tag-border);color:var(--text2);
+}
+.tag-feature{background:rgba(80,144,232,.08);color:var(--blue);border-color:rgba(80,144,232,.18)}
+.tag-bug{background:rgba(232,80,95,.07);color:var(--red);border-color:rgba(232,80,95,.16)}
+.tag-ui,.tag-ux{background:rgba(139,109,224,.09);color:var(--purple);border-color:rgba(139,109,224,.18)}
+.tag-performance{background:rgba(54,184,150,.08);color:var(--teal);border-color:rgba(54,184,150,.18)}
+.tag-security{background:rgba(232,168,48,.08);color:var(--amber);border-color:rgba(232,168,48,.18)}
+.tag-breaking{background:rgba(232,80,95,.1);color:var(--red);border-color:rgba(232,80,95,.22)}
+.tag-ai,.tag-reasoning,.tag-multi-modal,.tag-interface{
+  background:rgba(200,240,80,.07);color:var(--accent);border-color:rgba(200,240,80,.18);
+}
+
+.entry-media-wrap{
+  width:100%;border-radius:12px;overflow:hidden;
+  border:1px solid var(--border);margin-bottom:24px;
+  background:var(--surface2);
+}
+.entry-media-wrap img,.entry-media-wrap video{
+  width:100%;display:block;aspect-ratio:16/7;object-fit:cover;
+}
+
+.entry-desc{font-size:14px;color:var(--text2);font-weight:300;line-height:1.75;margin-bottom:20px}
+
+.entry-bullets{list-style:none;display:flex;flex-direction:column;gap:11px;margin-bottom:22px}
+.entry-bullets li{display:flex;gap:14px;font-size:14px;color:var(--text2);font-weight:300;line-height:1.6}
+.entry-bullets li::before{
+  content:'';width:4px;height:4px;border-radius:50%;
+  background:var(--accent);flex-shrink:0;margin-top:9px;
+}
+.entry-bullets li strong{color:var(--text);font-weight:500}
+
+.entry-code{
+  background:var(--code-bg);border:1px solid var(--border);
+  border-radius:10px;padding:20px 22px;
+  font-family:var(--mono);font-size:12px;color:var(--text2);
+  overflow-x:auto;line-height:1.8;margin-bottom:24px;position:relative;
+}
+.code-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border);
+}
+.code-dots{display:flex;gap:5px}
+.code-dots span{width:8px;height:8px;border-radius:50%}
+.code-dots span:nth-child(1){background:#e8505f;opacity:.5}
+.code-dots span:nth-child(2){background:#e8a830;opacity:.5}
+.code-dots span:nth-child(3){background:#36b896;opacity:.5}
+.code-lang-label{font-size:10px;font-family:var(--mono);color:var(--text3);letter-spacing:1px;text-transform:uppercase}
+.entry-code pre{white-space:pre-wrap;word-break:break-word}
+
+/* ── COLLAPSIBLE ── */
+.collapsible{
+  border:1px solid var(--border);border-radius:10px;
+  overflow:hidden;margin-bottom:10px;
+  background:var(--surface);transition:border-color .2s;
+}
+.collapsible:hover{border-color:var(--border2)}
+.collapsible:last-of-type{margin-bottom:0}
+
+.collapsible-trigger{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:13px 16px;cursor:pointer;
+  background:transparent;border:none;width:100%;text-align:left;
+  color:var(--text);font-family:var(--body);
+  transition:background .15s;user-select:none;
+}
+.collapsible-trigger:hover{background:var(--surface2)}
+
+.collapsible-left{display:flex;align-items:center;gap:10px}
+
+.collapsible-icon{
+  width:26px;height:26px;border-radius:6px;
+  display:grid;place-items:center;flex-shrink:0;
+}
+.collapsible-icon.features{background:rgba(80,144,232,.1);color:var(--blue)}
+.collapsible-icon.bugs{background:rgba(232,80,95,.08);color:var(--red)}
+.collapsible-icon svg{width:12px;height:12px}
+
+.collapsible-label{font-size:12.5px;font-weight:500;letter-spacing:.1px;color:var(--text)}
+.collapsible-count{
+  font-size:10px;font-family:var(--mono);color:var(--text3);
+  background:var(--surface2);border:1px solid var(--border);
+  padding:1px 7px;border-radius:4px;letter-spacing:.3px;
+}
+
+.collapsible-chevron{
+  width:15px;height:15px;color:var(--text3);flex-shrink:0;
+  transition:transform .25s cubic-bezier(.4,0,.2,1);
+}
+/* default state: closed (chevron points right → down when open) */
+.collapsible .collapsible-chevron{transform:rotate(-90deg)}
+.collapsible.open .collapsible-chevron{transform:rotate(0deg)}
+
+.collapsible-body{
+  display:none;
+  padding:0 16px 16px;
+  border-top:1px solid var(--border);
+}
+.collapsible.open .collapsible-body{
+  display:block;
+  animation:expandDown .22s cubic-bezier(.16,1,.3,1);
+}
+@keyframes expandDown{
+  from{opacity:0;transform:translateY(-8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.collapsible-body .entry-bullets{margin:12px 0 0}
+
+/* entry divider */
+.entry-divider{
+  position:absolute;bottom:0;left:48px;right:0;height:1px;
+  background:linear-gradient(to right,var(--border),transparent 80%);
+}
+
+/* ── FOOTER ── */
+footer{
+  text-align:center;padding:48px 0 0;
+  border-top:1px solid var(--border);margin-top:16px;
+}
+.footer-inner{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:11.5px;font-family:var(--mono);color:var(--text3);letter-spacing:.5px;
+}
+.footer-dot{width:3px;height:3px;border-radius:50%;background:var(--text3)}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .page{padding:0 18px 100px}
+  header{padding:52px 0 40px}
+  .entry{padding:0 0 52px 32px}
+  h1{font-size:2.2rem}
+  .connect-card{padding:24px}
+}
+</style>
+</head>
+<body>
+
+<div class="retro-grid"></div>
+<div class="retro-grid-floor"></div>
+<div class="header-bloom"></div>
+
+<div class="page">
+
+  <header>
+    <div class="header-badge">
+      <span class="badge-pulse"></span>
+      Release Notes
+    </div>
+    <h1>Changelog</h1>
+    <p class="header-sub">Improvements, fixes, and new features — documented as they ship.</p>
+    <div class="header-actions">
+      <button class="pill-btn" onclick="toggleTheme()">
+        <svg id="theme-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+          <path d="M13 9.5a5.5 5.5 0 1 1-7-7 7 7 0 0 0 7 7z"/>
+        </svg>
+        <span id="theme-label">Light mode</span>
+      </button>
+    </div>
+  </header>
+
+  <div id="connect-view" style="display:none">
+    <div class="connect-card">
+      <h3>Connect Supabase</h3>
+      <p>Enter your project credentials to pull changelog entries from the database.</p>
+      <div class="cfg-group">
+        <label>Project URL</label>
+        <input class="cfg-input" id="pub-url" type="text" placeholder="https://xxxx.supabase.co"/>
+      </div>
+      <div class="cfg-group">
+        <label>Anon Key</label>
+        <input class="cfg-input" id="pub-key" type="text" placeholder="eyJhbGciOi..."/>
+      </div>
+      <div class="cfg-error" id="pub-error"></div>
+      <button class="connect-btn" onclick="connectAndLoad()">Connect &amp; Load →</button>
+      <button class="cfg-reset" onclick="resetCfg()">← Reset saved config</button>
+    </div>
+  </div>
+
+  <div id="loading-view" style="display:none">
+    <div class="timeline">
+      <div class="skeleton-entry" style="padding-top:0">
+        <div class="skel skel-sm" style="margin-bottom:16px"></div>
+        <div class="skel skel-lg" style="height:14px;margin-bottom:16px"></div>
+        <div class="skel skel-xs" style="margin-bottom:10px"></div>
+        <div class="skel skel-xl"></div><div class="skel skel-med"></div>
+      </div>
+      <div class="skeleton-entry">
+        <div class="skel skel-sm" style="margin-bottom:16px"></div>
+        <div class="skel skel-med" style="height:14px;margin-bottom:16px"></div>
+        <div class="skel skel-xs" style="margin-bottom:10px"></div>
+        <div class="skel skel-xl"></div><div class="skel skel-lg"></div>
+      </div>
+      <div class="skeleton-entry">
+        <div class="skel skel-sm" style="margin-bottom:16px"></div>
+        <div class="skel skel-lg" style="height:14px;margin-bottom:16px"></div>
+        <div class="skel skel-xs" style="margin-bottom:10px"></div>
+        <div class="skel skel-xl"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="error-view" style="display:none">
+    <div class="state-box">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="8" cy="8" r="6"/><line x1="8" y1="5" x2="8" y2="8.5"/><circle cx="8" cy="11" r=".6" fill="currentColor"/></svg>
+      <p id="error-msg">Could not load entries</p>
+      <button class="pill-btn" onclick="resetCfg()">Change config</button>
+    </div>
+  </div>
+
+  <div id="empty-view" style="display:none">
+    <div class="state-box">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2" y="2" width="12" height="12" rx="2"/><line x1="5" y1="6" x2="11" y2="6"/><line x1="5" y1="9" x2="8" y2="9"/></svg>
+      <p>No published releases yet.</p>
+    </div>
+  </div>
+
+  <div class="timeline" id="entries-view" style="display:none"></div>
+
+  <footer>
+    <div class="footer-inner">
+      <span id="footer-count">—</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+const { createClient } = supabase;
+const CFG_KEY = 'cl_supabase_cfg';
+let sb = null;
+
+// ── Theme ─────────────────────────────
+const savedTheme = localStorage.getItem('cl_theme') || 'dark';
+applyTheme(savedTheme);
+
+function applyTheme(t){
+  document.documentElement.dataset.theme = t;
+  const icon  = document.getElementById('theme-icon');
+  const label = document.getElementById('theme-label');
+  if(!icon) return;
+  if(t === 'light'){
+    icon.innerHTML = '<path d="M13 9.5a5.5 5.5 0 1 1-7-7 7 7 0 0 0 7 7z"/>';
+    if(label) label.textContent = 'Dark mode';
+  } else {
+    icon.innerHTML = '<circle cx="8" cy="8" r="3.2"/><line x1="8" y1="1.5" x2="8" y2="3"/><line x1="8" y1="13" x2="8" y2="14.5"/><line x1="1.5" y1="8" x2="3" y2="8"/><line x1="13" y1="8" x2="14.5" y2="8"/><line x1="3.4" y1="3.4" x2="4.4" y2="4.4"/><line x1="11.6" y1="11.6" x2="12.6" y2="12.6"/><line x1="12.6" y1="3.4" x2="11.6" y2="4.4"/><line x1="4.4" y1="11.6" x2="3.4" y2="12.6"/>';
+    if(label) label.textContent = 'Light mode';
+  }
+}
+function toggleTheme(){
+  const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('cl_theme', t);
+  applyTheme(t);
+}
+
+// ── Config ────────────────────────────
+function loadCfg(){ try{ return JSON.parse(localStorage.getItem(CFG_KEY)); }catch{ return null; } }
+function resetCfg(){ localStorage.removeItem(CFG_KEY); sb = null; showView('connect'); }
+
+function connectAndLoad(){
+  const url = document.getElementById('pub-url').value.trim();
+  const key = document.getElementById('pub-key').value.trim();
+  const err = document.getElementById('pub-error');
+  err.classList.remove('show');
+  if(!url || !key){ err.textContent='Both fields are required.'; err.classList.add('show'); return; }
+  localStorage.setItem(CFG_KEY, JSON.stringify({ url, key }));
+  initAndLoad(url, key);
+}
+function initAndLoad(url, key){
+  sb = createClient(url, key);
+  showView('loading');
+  loadEntries();
+}
+
+// ── Views ─────────────────────────────
+function showView(v){
+  ['connect','loading','error','empty','entries'].forEach(id => {
+    document.getElementById(id+'-view').style.display = (id===v) ? '' : 'none';
+  });
+}
+
+// ── Fetch ─────────────────────────────
+async function loadEntries(){
+  try{
+    const { data, error } = await sb
+      .from('changelog_entries')
+      .select('*')
+      .eq('status','published')
+      .order('date',{ ascending:false });
+
+    if(error) throw error;
+    if(!data || data.length === 0){ showView('empty'); return; }
+
+    entryIdx = 0;
+    renderEntries(data);
+    showView('entries');
+    document.getElementById('footer-count').textContent =
+      `${data.length} release${data.length !== 1 ? 's' : ''}`;
+  } catch(err){
+    document.getElementById('error-msg').textContent = 'Error: ' + err.message;
+    showView('error');
+  }
+}
+
+// ── Render ────────────────────────────
+let entryIdx = 0;
+
+function renderEntries(rows){
+  document.getElementById('entries-view').innerHTML = rows.map(renderEntry).join('');
+}
+
+function renderEntry(r){
+  const idx      = entryIdx++;
+  const media    = r.media    || [];
+  const tags     = r.tags     || [];
+  const bullets  = r.bullets  || [];
+  const features = r.features || [];
+  const bugs     = r.bugs     || [];
+
+  const firstImg = media.find(m => m.type && m.type.startsWith('image'));
+  const firstVid = media.find(m => m.type && m.type.startsWith('video'));
+
+  let mediaHtml = '';
+  if(firstVid){
+    mediaHtml = `<div class="entry-media-wrap"><video src="${esc(firstVid.url)}" autoplay muted loop playsinline></video></div>`;
+  } else if(firstImg){
+    mediaHtml = `<div class="entry-media-wrap"><img src="${esc(firstImg.url)}" alt="${esc(r.title)}" loading="lazy"/></div>`;
+  }
+
+  const tagsHtml = tags.map(t => `<span class="tag tag-${t}">${tagLabel(t)}</span>`).join('');
+
+  const bulletsHtml = bullets.length ? `
+    <ul class="entry-bullets">
+      ${bullets.map(b => {
+        const parts = b.split(':');
+        return `<li><strong>${esc(parts[0])}</strong>${parts.length > 1 ? ': ' + esc(parts.slice(1).join(':')) : ''}</li>`;
+      }).join('')}
+    </ul>` : '';
+
+  const codeHtml = r.code ? `
+    <div class="entry-code">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-lang-label">code</span>
+      </div>
+      <pre>${esc(r.code)}</pre>
+    </div>` : '';
+
+  // Features — default OPEN
+  const featuresHtml = features.length ? `
+    <div class="collapsible open" id="feat-${idx}">
+      <button class="collapsible-trigger" onclick="toggleCollapsible('feat-${idx}')">
+        <span class="collapsible-left">
+          <span class="collapsible-icon features">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><polyline points="2 8 6 12 14 4"/></svg>
+          </span>
+          <span class="collapsible-label">Features</span>
+          <span class="collapsible-count">${features.length}</span>
+        </span>
+        <svg class="collapsible-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+          <polyline points="4 6 8 10 12 6"/>
+        </svg>
+      </button>
+      <div class="collapsible-body">
+        <ul class="entry-bullets">
+          ${features.map(f => `<li>${esc(f)}</li>`).join('')}
+        </ul>
+      </div>
+    </div>` : '';
+
+  // Bug Fixes — default OPEN
+  const bugsHtml = bugs.length ? `
+    <div class="collapsible open" id="bug-${idx}">
+      <button class="collapsible-trigger" onclick="toggleCollapsible('bug-${idx}')">
+        <span class="collapsible-left">
+          <span class="collapsible-icon bugs">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="9" r="3.5"/><path d="M6 3.5h4"/><path d="M2.5 7.5l2 1.5"/><path d="M13.5 7.5l-2 1.5"/><path d="M4.5 13.5l-1.5 1"/><path d="M11.5 13.5l1.5 1"/></svg>
+          </span>
+          <span class="collapsible-label">Bug Fixes</span>
+          <span class="collapsible-count">${bugs.length}</span>
+        </span>
+        <svg class="collapsible-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+          <polyline points="4 6 8 10 12 6"/>
+        </svg>
+      </button>
+      <div class="collapsible-body">
+        <ul class="entry-bullets">
+          ${bugs.map(b => `<li>${esc(b)}</li>`).join('')}
+        </ul>
+      </div>
+    </div>` : '';
+
+  return `
+    <article class="entry">
+      <div class="entry-meta">
+        <span class="entry-date">${formatDate(r.date)}</span>
+        <span class="entry-version">v${esc(r.version)}</span>
+        <span class="entry-status-dot" title="Published"></span>
+      </div>
+      <h2 class="entry-title">${esc(r.title)}</h2>
+      <div class="entry-tags">${tagsHtml}</div>
+      ${mediaHtml}
+      ${r.description ? `<p class="entry-desc">${esc(r.description)}</p>` : ''}
+      ${bulletsHtml}
+      ${codeHtml}
+      ${featuresHtml}
+      ${bugsHtml}
+      <div class="entry-divider"></div>
+    </article>
+  `;
+}
+
+// ── Collapsible ───────────────────────
+function toggleCollapsible(id){
+  const el = document.getElementById(id);
+  if(el) el.classList.toggle('open');
+}
+
+// ── Utils ─────────────────────────────
+function esc(s){
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function formatDate(d){
+  if(!d) return '';
+  return new Date(d+'T12:00:00').toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+}
+function tagLabel(t){
+  const map={
+    feature:'Feature',bug:'Bug Fix',ui:'UI',ux:'UX',
+    performance:'Performance',security:'Security',breaking:'Breaking',
+    ai:'AI',reasoning:'Reasoning','multi-modal':'Multi-modal',interface:'Interface'
+  };
+  return map[t]||(t.charAt(0).toUpperCase()+t.slice(1));
+}
+
+// ── Boot ──────────────────────────────
+(function(){
+  const cfg = loadCfg();
+  if(cfg && cfg.url && cfg.key){
+    document.getElementById('pub-url').value = cfg.url;
+    document.getElementById('pub-key').value = cfg.key;
+    initAndLoad(cfg.url, cfg.key);
+  } else {
+    showView('connect');
+  }
+})();
+</script>
+</body>
+</html>
